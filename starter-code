@@ -1,5 +1,10 @@
-#include <bits/stdc++.h>
+#include "bits/stdc++.h"
+#define fio ios_base::sync_with_stdio(0);cin.tie(0);cout.tie(0)
+#define all(V) (V).begin(), (V).end()
 using namespace std;
-int main() {
+typedef long long ll;
+ll mod = 998244853;
+
+int main() {fio;
   
 }
