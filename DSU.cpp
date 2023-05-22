@@ -1,9 +1,10 @@
-class UnionFind {
+// By Rank
+class DSU {
 private:
     vector<int> parent, rank;
 
 public:
-    UnionFind(int size) {
+    DSU(int size) {
         parent.resize(size);
         rank.resize(size, 0);
 
@@ -31,3 +32,36 @@ public:
         }
     }
 };
+DSU dsu(size);
+
+// By Size
+class DSU {
+    public:
+    vector<int> parent, size;
+    DSU(int n) {
+        size.resize(n+1);
+        parent.resize(n+1);
+        for(int i = 0; i < n+1; i++) {
+            parent[i] = i;
+            size[i] = 1;
+        }
+    }
+    int findUPar(int node) {
+        if(node == parent[node]) return node;
+        return parent[node] = findUPar(parent[node]);
+    }
+    void unionBySize(int u, int v) {
+        int pu = findUPar(u);
+        int pv = findUPar(v);
+        if(pu == pv) return;
+        if(size[pu] < size[pv]) {
+            parent[pu] = pv;
+            size[pv] += size[pu];
+        }
+        else {
+            parent[pv] = pu;
+            size[pu] += size[pv];
+        }
+    }
+};
+DSU dsu(size);
