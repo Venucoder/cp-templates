@@ -109,3 +109,72 @@ private:
     vector<vector<int>> tree;
     int n;
 };
+
+// Persistant trees
+
+struct SegmentTree {
+ 
+public:
+    SegmentTree (int _n) : n(_n) {
+        roots.push_back(BuildInitialTree(0, n-1));
+    }
+ 
+    void UpdateValue (int ind, int val) {
+        roots.push_back(BuildNewVersion(roots.back(), ind, val, 0, n-1));
+    }
+ 
+    int Query (int ind, int x, int y) {
+        return query (x, y, roots[ind], 0, n-1);
+    }
+ 
+private:
+    struct Node {
+        int val;
+        Node *lft, *rgt;
+ 
+        Node(int _val) : val(_val), lft(NULL), rgt(NULL) {} 
+    };
+ 
+    Node* BuildInitialTree (int l, int r) {
+        if (l == r) return new Node(0);
+ 
+        Node* result = new Node(0);
+        int m = (l+r) >> 1;
+        result -> lft = BuildInitialTree(l, m);
+        result -> rgt = BuildInitialTree(m+1, r);
+ 
+        return result;
+    }
+ 
+    Node* BuildNewVersion (Node* prv_root, int ind, int val, int l, int r) {
+        if (l == r) return new Node(val);
+ 
+        Node* ans = new Node(0);
+        int m = (l+r) >> 1;
+        if (m >= ind) {
+            ans -> lft = BuildNewVersion(prv_root -> lft, ind, val, l, m);
+            ans -> rgt = prv_root -> rgt;
+        }
+        else {
+            ans -> lft = prv_root -> lft;
+            ans -> rgt = BuildNewVersion(prv_root -> rgt, ind, val, m+1, r);
+        }
+ 
+        ans -> val = ans -> lft -> val + ans -> rgt -> val;
+        return ans;
+    }
+ 
+    int query (int x, int y, Node* root, int l, int r) {
+        if (r < x || l > y) return 0;
+        if (l >= x && r <= y) return root -> val;
+ 
+        int m = (l+r) >> 1;
+        return (
+            query(x, y, root->lft, l, m) + 
+            query(x, y, root->rgt, m+1, r)
+        );
+    }
+ 
+    vector<Node*> roots;
+    int n;
+};
