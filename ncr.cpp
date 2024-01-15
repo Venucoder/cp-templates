@@ -1,3 +1,4 @@
+// iterative
 ll power(ll base, ll exponent, ll modx = mod) {
     ll ret = 1 % modx;
     base %= modx;
@@ -32,4 +33,12 @@ ll nCr(ll N, ll R) {
         return ((fac[N] * ifac[R]) % mod * ifac[N - R]) % mod;
     }
     return 0;
+}
+// recursive
+int modpow(int x, int n, int m) {
+    if (n == 0) return 1%m;
+    long long u = modpow(x,n/2,m);
+    u = (u*u)%m;
+    if (n%2 == 1) u = (u*x)%m;
+    return u;
 }
