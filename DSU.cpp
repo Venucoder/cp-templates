@@ -1,3 +1,52 @@
+// DSU by size
+class DSU {
+private:
+    vector<int> parent; // Stores the parent of each element
+    vector<int> size;   // Stores the size of each set
+
+public:
+    // Constructor to initialize DSU with 'n' elements
+    DSU(int n) {
+        parent.resize(n + 1);
+        size.resize(n + 1, 1); // Initially, each set has size 1
+        for (int i = 1; i <= n; ++i) {
+            parent[i] = i; // Each element is its own parent initially
+        }
+    }
+
+    // Find the root of the set containing 'x' with path compression
+    int find(int x) {
+        if (parent[x] == x) return x; // If x is the root, return x
+        return parent[x] = find(parent[x]); // Path compression: set parent[x] to root
+    }
+
+    // Union two sets containing 'x' and 'y' by size
+    void unite(int x, int y) {
+        int rootX = find(x); // Find root of x
+        int rootY = find(y); // Find root of y
+        if (rootX == rootY) return; // Already in the same set
+
+        // Union by size: attach smaller set to larger set
+        if (size[rootX] < size[rootY]) {
+            parent[rootX] = rootY;
+            size[rootY] += size[rootX];
+        } else {
+            parent[rootY] = rootX;
+            size[rootX] += size[rootY];
+        }
+    }
+
+    // Check if 'x' and 'y' are in the same set
+    bool connected(int x, int y) {
+        return find(x) == find(y);
+    }
+
+    // Get the size of the set containing 'x'
+    int getSize(int x) {
+        return size[find(x)];
+    }
+};
+
 // By Rank
 class DSU {
 private:
@@ -29,38 +78,6 @@ public:
         } else {
             parent[yset] = xset;
             rank[xset]++;
-        }
-    }
-};
-DSU dsu(size);
-
-// By Size
-class DSU {
-    public:
-    vector<int> parent, size;
-    DSU(int n) {
-        size.resize(n+1);
-        parent.resize(n+1);
-        for(int i = 0; i < n+1; i++) {
-            parent[i] = i;
-            size[i] = 1;
-        }
-    }
-    int findUPar(int node) {
-        if(node == parent[node]) return node;
-        return parent[node] = findUPar(parent[node]);
-    }
-    void unionBySize(int u, int v) {
-        int pu = findUPar(u);
-        int pv = findUPar(v);
-        if(pu == pv) return;
-        if(size[pu] < size[pv]) {
-            parent[pu] = pv;
-            size[pv] += size[pu];
-        }
-        else {
-            parent[pv] = pu;
-            size[pu] += size[pv];
         }
     }
 };
