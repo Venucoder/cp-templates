@@ -1,3 +1,83 @@
+// Range Sum - Point Update - 0 indexed
+#include <vector>
+#include <algorithm>
+
+class SegmentTree {
+private:
+    int n; // Size of the input array
+    std::vector<int> tree; // Stores the segment tree
+
+    // Build the tree recursively
+    void build(const std::vector<int>& arr, int node, int start, int end) {
+        if (start == end) {
+            tree[node] = arr[start]; // Leaf node (single element)
+        } else {
+            int mid = (start + end) / 2;
+            build(arr, 2*node + 1, start, mid);    // Build left child
+            build(arr, 2*node + 2, mid + 1, end);  // Build right child
+            tree[node] = tree[2*node + 1] + tree[2*node + 2]; // Merge children
+        }
+    }
+
+    // Update a single element (point update)
+    void pointUpdate(int node, int start, int end, int idx, int value) {
+        if (start == end) {
+            tree[node] = value; // Update leaf node
+        } else {
+            int mid = (start + end) / 2;
+            if (idx <= mid) {
+                pointUpdate(2*node + 1, start, mid, idx, value); // Update left subtree
+            } else {
+                pointUpdate(2*node + 2, mid + 1, end, idx, value); // Update right subtree
+            }
+            tree[node] = tree[2*node + 1] + tree[2*node + 2]; // Recalculate parent
+        }
+    }
+
+    // Query sum in range [l, r]
+    int queryRange(int node, int start, int end, int l, int r) {
+        if (r < start || end < l) return 0; // No overlap
+        if (l <= start && end <= r) return tree[node]; // Complete overlap
+        int mid = (start + end) / 2;
+        // Partial overlap: query both children
+        return queryRange(2*node + 1, start, mid, l, r) + 
+               queryRange(2*node + 2, mid + 1, end, l, r);
+    }
+
+public:
+    SegmentTreeSum(const std::vector<int>& arr) {
+        n = arr.size();
+        tree.resize(4 * n, 0); // Allocate memory (4*n is safe size)
+        build(arr, 0, 0, n - 1); // Build from root node (index 0)
+    }
+
+    // Public method to update value at index `idx`
+    void update(int idx, int value) {
+        pointUpdate(0, 0, n - 1, idx, value);
+    }
+
+    // Public method to get sum in range [l, r]
+    int get(int l, int r) {
+        return queryRange(0, 0, n - 1, l, r);
+    }
+};
+
+// Example usage
+int main() {
+    std::vector<int> arr = {1, 3, 5, 7, 9, 11};
+    SegmentTreeSum st(arr);
+
+    std::cout << "Sum in range [1, 3]: " << st.get(1, 3) << std::endl; // Output: 15 (3+5+7)
+
+    st.update(2, 7); // Change element at index 2 from 5 → 7
+    std::cout << "Sum in range [1, 3] after update: " << st.get(1, 3) << std::endl; // Output: 17 (3+7+7)
+
+    return 0;
+}
+
+// =============================================================================================================
+
+// RangeSum - Point Update
 struct SegTree {
 public:
  
