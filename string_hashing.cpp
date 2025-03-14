@@ -1,3 +1,25 @@
+class Hashing {
+    public:
+        vector<ll> hash, p;
+        ll mod = 1e9 + 7;
+        ll p1 = 31;
+        Hashing(string s) {
+            int n = s.size();
+            hash.resize(n);
+            p.resize(n);
+            hash[0] = s[0] - 'a' + 1;
+            p[0] = 1;
+            for(int i = 1; i < n; i++) {
+                hash[i] = (hash[i-1] * p1 + s[i] - 'a' + 1) % mod;
+                p[i] = (p[i-1] * p1) % mod;
+            }
+        }
+        ll getHash(int l, int r) {
+            if(l == 0) return hash[r];
+            return (hash[r] - (hash[l-1] * p[r-l+1]) % mod + mod) % mod;
+        }
+};
+
 // From https://cp-algorithms.com/
 vector<long long> p_pow; 
 vector<long long> prefix_hash;
