@@ -19,20 +19,24 @@ private:
         }
     }
 
-    // Update a single element (point update)
-    void pointUpdate(int node, int start, int end, int idx, int value) {
+    // Point Update - Add/Replace
+    void pointUpdate(int node, int start, int end, int idx, int value, bool isReplace=true) {
         if (start == end) {
-            tree[node] = value; // Update leaf node
+            if (isReplace)
+                tree[node] = value;  // Replace the value
+            else
+                tree[node] += value; // Add to the existing value
         } else {
             int mid = (start + end) / 2;
             if (idx <= mid) {
-                pointUpdate(2*node + 1, start, mid, idx, value); // Update left subtree
+                pointUpdate(2 * node + 1, start, mid, idx, value, isReplace); // Left subtree
             } else {
-                pointUpdate(2*node + 2, mid + 1, end, idx, value); // Update right subtree
+                pointUpdate(2 * node + 2, mid + 1, end, idx, value, isReplace); // Right subtree
             }
-            tree[node] = tree[2*node + 1] + tree[2*node + 2]; // Recalculate parent
+            tree[node] = tree[2 * node + 1] + tree[2 * node + 2]; // Recalculate sum
         }
     }
+
 
     // Query sum in range [l, r]
     int queryRange(int node, int start, int end, int l, int r) {
