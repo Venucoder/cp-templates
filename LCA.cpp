@@ -2,7 +2,7 @@
 static constexpr int LOGN = 20; // log2(max nodes) + 1, adjust as needed
 vector<vector<int>> adj;
 vector<vector<int>> up;
-vector<int> tin, tout, subtree_xor;
+vector<int> tin, tout, depth;
 int timer = 0;
 
 // Preprocessing DFS: fills LCA tables and computes subtree XOR
@@ -14,8 +14,8 @@ void dfs(int v, int p, const vector<int>& nums) {
         up[v][k] = up[up[v][k - 1]][k - 1];
     for (int u : adj[v]) {
         if (u != p) {
+            depth[u] = depth[v] + 1;
             dfs(u, v, nums);
-            subtree_xor[v] ^= subtree_xor[u];
         }
     }
     tout[v] = ++timer;
@@ -34,6 +34,20 @@ int lca(int u, int v) {
             u = up[u][k];
     }
     return up[u][0];
+}
+
+int kthAncestor(int v, int k) {
+    for (int i = 0; i <= LOGN && v != -1; ++i) {
+        if (k & (1 << i)) {
+            v = up[v][i];
+        }
+    }
+    return v;
+}
+
+int dist(int u, int v) {
+    int ancestor = lca(u, v);
+    return depth[u] + depth[v] - 2 * depth[ancestor];
 }
 
 // Initialization
@@ -57,6 +71,35 @@ dfs(0, 0, nums);
 // lca(u, v): lowest common ancestor of any two nodes (O(logN))
 
 // =============================================================================================================================================
+
+// LCA with iterative using depth
+
+int lca(int u, int v) {
+    if (depth[u] < depth[v])
+        std::swap(u, v);
+
+    // Step 1: Lift u up to the same depth as v
+    int diff = depth[u] - depth[v];
+    for (int j = 0; j <= LOGN; j++) {
+        if ((diff >> j) & 1)
+            u = up[u][j];
+    }
+
+    if (u == v)
+        return u;
+
+    // Step 2: Lift both u and v up until their ancestors differ
+    for (int j = LOGN; j >= 0; j--) {
+        if (up[u][j] != -1 && up[u][j] != up[v][j]) {
+            u = up[u][j];
+            v = up[v][j];
+        }
+    }
+
+    // Step 3: Their parent is the LCA
+    return up[u][0];
+}
+
 
 int up[200005][20];
 int lvl[200005];
